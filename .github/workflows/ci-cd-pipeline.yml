@@ -1,0 +1,44 @@
+name: Blue-Green Deployment Pipeline
+
+on:
+  push:
+    branches:
+      - main  # Trigger the workflow on push to the main branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest  # Use an Ubuntu runner for the CI/CD job
+
+    steps:
+      # Step 1: Checkout the code from GitHub repository
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # Step 2: Set up environment (optional, install any dependencies if required)
+      - name: Set up Python (if needed)
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'  # Set up Python, if needed
+
+      # Step 3: Make scripts executable and run them
+      - name: Run deploy.sh
+        run: |
+          chmod +x deploy.sh
+          ./deploy.sh
+
+      - name: Run health check script
+        run: |
+          chmod +x check_health.sh
+          ./check_health.sh
+
+      - name: Switch traffic to blue environment
+        run: |
+          chmod +x switch_traffic.sh
+          ./switch_traffic.sh blue  # You can change to "green" if needed
+
+      # Optional Step 4: Run rollback if deployment fails (you can customize this logic)
+      - name: Run rollback script (optional)
+        run: |
+          chmod +x rollback.sh
+          ./rollback.sh
+
